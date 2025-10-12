@@ -37,8 +37,13 @@ static bool IsPacketSizeValid(RacePacket::EType packetType, u8 packetSize)
         }
     }
 
+    // Detect Pulsar by packet size patterns
+    // Pulsar often sends RoomSelect packets with size 0x09 which vanilla rejects
+    const bool isPulsar =
+        (packetType == RacePacket::RoomSelect && packetSize == 0x09);
+
     std::size_t* packetBufferSizesPointer;
-    if (!NetController::Instance()->inVanillaMatch()) {
+    if (!NetController::Instance()->inVanillaMatch() || isPulsar) {
         extern std::size_t packetBufferSizes[sizeof(RacePacket::sizes)] AT(
             RMCXD_PORT(0x8089A194, 0x80895AC4, 0x808992F4, 0x808885CC)
         );
@@ -75,7 +80,7 @@ static bool IsPacketSizeValid(RacePacket::EType packetType, u8 packetSize)
     }
     case RacePacket::RoomSelect: {
         // 'Room' packet
-        if (packetSize < sizeof(SelectHandler::Packet)) {
+        if (!isPulsar && packetSize < sizeof(SelectHandler::Packet)) {
             return packetSize == sizeof(RoomHandler::Packet);
         }
 
