@@ -6,6 +6,20 @@
 #  include "import/mkw/ui/page/wifiFriendMenuPage.hpp"
 #  include "import/mkw/ui/page/wifiMenuPage.hpp"
 #  include "wwfcPatch.hpp"
+#  include "wwfcLog.hpp"
+
+namespace wwfc::mkw::Net
+{
+
+// Extended packet structure for Pulsar
+struct PulSELECT : public SelectHandler::Packet {
+    u16 pulVote; // 0x38
+    u16 pulWinningTrack; // 0x3a
+    u8 variantIdx; // 0x3c
+    // ... other fields not needed
+};
+
+} // namespace wwfc::mkw::Net
 
 namespace wwfc::mkw::Net
 {
@@ -276,13 +290,17 @@ WWFC_DEFINE_PATCH = {
     selectHandler->decideCourse();
     selectHandler->initPlayerIdsToPlayerAids();
 
-    SelectHandler::Packet::SelectedCourse selectedCourse =
-        selectHandler->sendPacket().selectedCourse;
+    // SelectHandler::Packet::SelectedCourse selectedCourse =
+    //     selectHandler->sendPacket().selectedCourse;
     SelectHandler::Packet::EngineClass engineClass =
         selectHandler->sendPacket().engineClass;
 
+    // Get the Pulsar course ID from the extended packet
+    auto* pulPacket = reinterpret_cast<PulSELECT*>(&selectHandler->sendPacket());
+    u16 pulsarCourseId = pulPacket->pulWinningTrack;
+
     wwfc::GPReport::ReportU32(
-        "wl:mkw_select_course", static_cast<u32>(selectedCourse)
+        "wl:mkw_select_course", static_cast<u32>(pulsarCourseId)
     );
     wwfc::GPReport::ReportU32(
         "wl:mkw_select_cc", static_cast<u32>(engineClass)
