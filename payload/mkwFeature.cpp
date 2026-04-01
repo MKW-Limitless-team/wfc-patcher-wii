@@ -279,35 +279,35 @@ WWFC_DEFINE_PATCH = {
 };
 
 // Report information about the upcoming match to the server
-WWFC_DEFINE_PATCH = {
-    Patch::CallWithCTR( //
-        WWFC_PATCH_LEVEL_FEATURE, //
-        RMCXD_PORT(0x8066148C, 0x80659550, 0x80660AF8, 0x8064F7A4), //
-        []() -> void {
-    using namespace mkw::Net;
+// WWFC_DEFINE_PATCH = {
+//     Patch::CallWithCTR( //
+//         WWFC_PATCH_LEVEL_FEATURE, //
+//         RMCXD_PORT(0x8066148C, 0x80659550, 0x80660AF8, 0x8064F7A4), //
+//         []() -> void {
+//     using namespace mkw::Net;
 
-    SelectHandler* selectHandler = SelectHandler::Instance();
-    selectHandler->decideCourse();
-    selectHandler->initPlayerIdsToPlayerAids();
+//     SelectHandler* selectHandler = SelectHandler::Instance();
+//     selectHandler->decideCourse();
+//     selectHandler->initPlayerIdsToPlayerAids();
 
-    // SelectHandler::Packet::SelectedCourse selectedCourse =
-    //     selectHandler->sendPacket().selectedCourse;
-    SelectHandler::Packet::EngineClass engineClass =
-        selectHandler->sendPacket().engineClass;
+//     // SelectHandler::Packet::SelectedCourse selectedCourse =
+//     //     selectHandler->sendPacket().selectedCourse;
+//     SelectHandler::Packet::EngineClass engineClass =
+//         selectHandler->sendPacket().engineClass;
 
-    // Get the Pulsar course ID from the extended packet
-    auto* pulPacket = reinterpret_cast<PulSELECT*>(&selectHandler->sendPacket());
-    u16 pulsarCourseId = pulPacket->pulWinningTrack;
+//     // Get the Pulsar course ID from the extended packet
+//     auto* pulPacket = reinterpret_cast<PulSELECT*>(&selectHandler->sendPacket());
+//     u16 pulsarCourseId = pulPacket->pulWinningTrack;
 
-    wwfc::GPReport::ReportU32(
-        "wl:mkw_select_course", static_cast<u32>(pulsarCourseId)
-    );
-    wwfc::GPReport::ReportU32(
-        "wl:mkw_select_cc", static_cast<u32>(engineClass)
-    );
-}
-    ),
-};
+//     wwfc::GPReport::ReportU32(
+//         "wl:mkw_select_course", static_cast<u32>(pulsarCourseId)
+//     );
+//     wwfc::GPReport::ReportU32(
+//         "wl:mkw_select_cc", static_cast<u32>(engineClass)
+//     );
+// }
+//     ),
+// };
 
 // Allow the "Open Host" feature to be enabled via the press of a button
 WWFC_DEFINE_PATCH = {
